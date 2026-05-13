@@ -1,0 +1,9 @@
+.DS_Store
+.zed
+node_modules
+*.log
+/target
+Cargo.lock
+gh.zip
+gh_setup.msi
+gh_cli/

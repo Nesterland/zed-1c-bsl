@@ -1,0 +1,5 @@
+name = "SDBL Embedded"
+grammar = "sdbl_embedded"
+line_comments = ["//"]
+tab_size = 4
+hard_tabs = false

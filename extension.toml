@@ -1,0 +1,23 @@
+id = "1c-bsl"
+name = "1C BSL"
+version = "0.0.1"
+schema_version = 1
+authors = ["Nesterland"]
+description = "1C:Enterprise BSL, OneScript and SDBL language support for Zed"
+repository = "https://github.com/Nesterland/zed-1c-bsl"
+snippets = ["./snippets/bsl.json"]
+
+[grammars.bsl]
+repository = "https://github.com/alkoleft/tree-sitter-bsl"
+rev = "51521215783571a99e885786bb6d7de9cc49c1fd"
+path = "grammars/bsl"
+
+[grammars.sdbl]
+repository = "https://github.com/alkoleft/tree-sitter-bsl"
+rev = "51521215783571a99e885786bb6d7de9cc49c1fd"
+path = "grammars/sdbl"
+
+[grammars.sdbl_embedded]
+repository = "https://github.com/alkoleft/tree-sitter-bsl"
+rev = "51521215783571a99e885786bb6d7de9cc49c1fd"
+path = "editors/zed-bsl/grammars/sdbl-embedded"
