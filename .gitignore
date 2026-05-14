@@ -7,3 +7,11 @@ Cargo.lock
 gh.zip
 gh_setup.msi
 gh_cli/
+
+# Исходники грамматик (используются только для сборки .wasm)
+grammars/bsl/
+grammars/sdbl/
+grammars/sdbl_embedded/
+
+# Пользовательские тестовые файлы
+examples/basic_1.bsl

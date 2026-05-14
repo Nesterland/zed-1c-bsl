@@ -4,6 +4,7 @@ path_suffixes = ["bsl", "osl"]
 line_comments = ["//"]
 tab_size = 4
 hard_tabs = false
+language_servers = ["bsl"]
 
 [[brackets]]
 start = "("

@@ -1,11 +1,14 @@
 id = "1c-bsl"
 name = "1C BSL"
-version = "0.0.2"
+version = "0.0.3"
 schema_version = 1
 authors = ["Nesterland"]
 description = "1C:Enterprise BSL, OneScript and SDBL language support for Zed"
 repository = "https://github.com/Nesterland/zed-1c-bsl"
 snippets = ["./snippets/bsl.json"]
+
+[language_servers.bsl]
+languages = ["BSL"]
 
 [grammars.bsl]
 repository = "https://github.com/alkoleft/tree-sitter-bsl"

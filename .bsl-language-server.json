@@ -1,0 +1,35 @@
+{
+  "language": "ru",
+  "diagnostics": {
+    "lineLength": {
+      "maxLineLength": 140
+    },
+    "deprecated": {
+      "showDeprecated": true
+    },
+    "cognitiveComplexity": {
+      "checkModuleBody": true,
+      "maxModuleBodyScore": 25
+    },
+    "unusedLocalVariable": {
+      "enable": true
+    },
+    "emptyCodeBlock": {
+      "enable": true
+    },
+    "typo": {
+      "enable": true
+    },
+    "unknownPreprocessorSymbol": {
+      "enable": true
+    },
+    "unusedParameters": {
+      "enable": true
+    }
+  },
+  "codeLens": {
+    "showCognitiveComplexity": true,
+    "showCyclomaticComplexity": true
+  },
+  "traceLog": false
+}

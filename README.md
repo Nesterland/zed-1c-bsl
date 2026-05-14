@@ -4,6 +4,8 @@
 
 Репозиторий проекта: https://github.com/Nesterland/zed-1c-bsl
 
+**Версия:** 0.0.3 | **Статус:** 🚧 В разработке
+
 ## Что поддерживается
 
 - Файлы BSL: `.bsl`, `.osl`.
@@ -11,21 +13,51 @@
 - Подсветка ключевых слов, процедур, функций, вызовов методов, строк, чисел, дат, комментариев и препроцессора.
 - Подсветка встроенных запросов 1С внутри строк BSL, если строка начинается с `ВЫБРАТЬ`, `SELECT`, `УНИЧТОЖИТЬ` или `DROP`.
 - Скобки и парные символы.
-- Сниппеты для процедур, функций, условий, циклов, попыток и областей.
+- Сниппеты для процедур, функций, условий, циклов, попыток и областей (~40 шт).
+- Outline (структура документа), text objects.
+- LSP-диагностика и автодополнение через [BSL Language Server](https://github.com/1c-syntax/bsl-language-server).
+- Авто-отступы (indents) для всех основных конструкций.
 
 ## Структура
 
-- `extension.toml` — манифест расширения Zed.
-- `languages/bsl/config.toml` — описание языка BSL.
-- `languages/bsl/highlights.scm` — правила подсветки BSL.
-- `languages/bsl/injections.scm` — внедрение подсветки SDBL в строки BSL.
-- `languages/sdbl/config.toml` — описание языка SDBL.
-- `languages/sdbl/highlights.scm` — правила подсветки SDBL.
-- `languages/sdbl-embedded/config.toml` — описание встроенного языка запросов.
-- `languages/sdbl-embedded/highlights.scm` — правила подсветки встроенного SDBL.
-- `snippets/bsl.json` — сниппеты.
-- `examples/basic.bsl` — пример BSL-файла.
-- `examples/query.sdbl` — пример файла запроса.
+```
+zed-1c-bsl/
+  extension.toml              # Манифест расширения + LSP-декларация
+  LICENSE                     # MIT
+  README.md
+  languages/
+    bsl/
+      config.toml             # Описание языка BSL
+      highlights.scm          # Правила подсветки BSL
+      injections.scm          # Внедрение SDBL в строки BSL
+      brackets.scm            # Парные скобки
+      indents.scm             # Авто-отступы
+      outline.scm             # Структура документа
+      textobjects.scm         # Text objects
+    sdbl/
+      config.toml
+      highlights.scm
+    sdbl-embedded/
+      config.toml
+      highlights.scm
+  snippets/
+    bsl.json                  # ~40 сниппетов
+  examples/
+    basic.bsl                 # Пример BSL-файла
+    query.sdbl                # Пример файла запроса
+  docs/
+    LSP_SETUP.md              # Инструкция по настройке LSP
+  .bsl-language-server.json   # Шаблон конфигурации LSP
+  grammars/                   # Tree-sitter грамматики (submodule)
+```
+
+## LSP-диагностика и автодополнение
+
+Расширение поддерживает интеграцию с **BSL Language Server** (LSP) — диагностика ошибок, автодополнение, навигация, hover, переименование и многое другое.
+
+Для настройки потребуется Java и JAR-файл `bsl-language-server.jar`. Подробная инструкция — в [docs/LSP_SETUP.md](docs/LSP_SETUP.md).
+
+> В будущем (Фаза 4) расширение будет само находить Java и скачивать сервер без ручной настройки.
 
 ## Как установить локально в Zed
 

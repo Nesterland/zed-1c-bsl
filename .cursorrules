@@ -1,0 +1,29 @@
+# 1C BSL — Расширение для Zed Editor
+
+## Суть
+Расширение для IDE **Zed** с поддержкой **1C:Enterprise BSL**, **OneScript**, **SDBL**.
+Репозиторий: https://github.com/Nesterland/zed-1c-bsl
+Версия: **0.0.2** → **0.0.3** (в разработке)
+Грамматика: Tree-sitter https://github.com/alkoleft/tree-sitter-bsl (rev 5152121)
+
+## Ключевые файлы
+| Файл | Назначение |
+|------|-----------|
+| extension.toml | Манифест + LSP-конфиг |
+| languages/bsl/ | Подсветка, отступы, инъекции, outline, textobjects |
+| languages/sdbl/ | Подсветка SDBL |
+| languages/sdbl-embedded/ | Встроенный SDBL |
+| grammars/bsl/ | Tree-sitter грамматика (редко трогать) |
+| snippets/bsl.json | ~40 сниппетов |
+| **PLAN.md** | **План разработки. ЧИТАТЬ ПЕРВЫМ В НОВОЙ СЕССИИ** |
+| TZ.md | Техническое задание |
+| AUDIT.md | Протокол разработки |
+| AGENTS.md | Контекст для Zed AI |
+
+## Правила работы
+1. **При старте сессии — сразу читать PLAN.md** для определения точки продолжения
+2. После каждого значимого изменения — обновлять PLAN.md и AUDIT.md
+3. Перед правкой .scm — смотреть эталон vsc-language-1c-bsl
+4. grammars/ — редактировать только если нужно менять сам парсер (редко)
+5. Основная работа — в languages/ и snippets/
+6. AGENTS.md, .cursorrules, PLAN.md, TZ.md — держать синхронно

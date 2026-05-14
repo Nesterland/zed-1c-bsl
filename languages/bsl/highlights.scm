@@ -204,8 +204,9 @@
 ; 14. Переменные и параметры
 ; -----------------------------------------------------------------------------
 ; Объявления Перем
+; Примечание: _var_definition_variables — скрытый узел, его нельзя указывать в запросе.
+; Переменные (variable_spec) напрямую всплывают в var_definition.
 (var_definition
-  _var_definition_variables
   (variable_spec
     name: (identifier) @variable))
 
