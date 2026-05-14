@@ -15,6 +15,14 @@
 - Других скрытых узлов (`_*`) в запросах `.scm` не обнаружено.
 - WASM-грамматики собраны tree-sitter v0.25.10 (LANGUAGE_VERSION 15), валидны.
 
+### v0.0.3: Публикация в каталог Zed (2025-01-20)
+
+- ✅ Форкнут `zed-industries/extensions` → `Nesterland/extensions`
+- ✅ Добавлен submodule `extensions/1c-bsl` → https://github.com/Nesterland/zed-1c-bsl
+- ✅ Прописана запись в `extensions.toml` (алфавитный порядок)
+- ✅ Открыт PR в zed-industries/extensions
+- ⬜ Ожидание ревью и мёрджа
+
 ---
 
 ## Этап 1: Анализ и улучшение подсветки синтаксиса (2025-01-20)
