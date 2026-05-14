@@ -2,7 +2,7 @@
 
 Расширение для IDE Zed с поддержкой подсветки синтаксиса 1C:Enterprise BSL, OneScript и языка запросов 1С SDBL.
 
-Репозиторий проекта: `https://github.com/Nesterland/zed-1c-bsl`.
+Репозиторий проекта: https://github.com/Nesterland/zed-1c-bsl
 
 ## Что поддерживается
 
