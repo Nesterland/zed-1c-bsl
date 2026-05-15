@@ -1,6 +1,39 @@
 # Протокол разработки расширения 1C BSL для Zed
 
-## Версия: 0.0.3 (в разработке)
+## Версия: 0.1.0 (предрелиз)
+
+### v0.1.0: Релизная подготовка (2025-01-20)
+
+**Выполнено:**
+- README.md — переведён на английский, обновлён под v0.1.0
+- CHANGELOG.md — создан (0.0.1 → 0.1.0)
+- Версия поднята: extension.toml (0.0.3→0.1.0), Cargo.toml (0.0.3→0.1.0)
+- WASM артефакт скопирован в корень: 1c-bsl.wasm (158K)
+
+### v0.1.0: Rust WASM-расширение (2025-01-20)
+
+**Созданы файлы:**
+- `Cargo.toml` — манифест Rust-проекта (target: wasm32-wasip1, crate: cdylib)
+- `src/lib.rs` — реализация trait `Extension`: `find_java()`, `ensure_jar()`, `language_server_command()`
+- `extension.toml` — добавлен `wasm = true` для авто-запуска LSP через WASM
+- `1c-bsl.wasm` — скомпилированный WASM (158K, release, LTO)
+- `docs/WASM_BUILD.md` — инструкция по сборке (EN)
+- `docs/LSP_SETUP.md` — переведён на английский
+
+**Сборка:** `cargo build --target wasm32-wasip1 --release` — успешно.
+
+**Архитектура:**
+- `find_java()`: сначала проверяет `JAVA_HOME` (оба варианта: java/java.exe), fallback — "java"
+- `ensure_jar()`: кэширует JAR в `~/.cache/zed/bsl-language-server/`; скачивает через `latest_github_release()` + `download_file()` из `1c-syntax/bsl-language-server`
+- `language_server_command()`: возвращает `Command { program: java, args: ["-Xmx2g", "-jar", jar] }`
+- Статус-индикатор в UI через `set_language_server_installation_status()`
+
+### v0.0.3 bugfix 2: Улучшен injections.scm (2025-01-20)
+
+**Изменения:**
+- Regex упрощён: `(?i)` для регистронезависимости, 4 альтернативы вместо 8
+- Добавлен подробный комментарий, объясняющий `[\\s|]*` (pipe = символ конкатенации строк BSL, не альтернация)
+- Документированы поддерживаемые типы запросов (ВЫБРАТЬ/SELECT → query, УНИЧТОЖИТЬ/DROP → destroy_statement)
 
 ### v0.0.3 bugfix 1: Исправлена критическая ошибка подсветки (2025-01-20)
 

@@ -1,23 +1,23 @@
-# Настройка BSL Language Server в Zed
+# BSL Language Server Setup in Zed
 
-Расширение **1C BSL** поддерживает автодополнение, диагностику, навигацию и другие возможности через **BSL Language Server** (реализация LSP для 1C:Enterprise и OneScript).
+The **1C BSL** extension supports autocompletion, diagnostics, navigation, and more via the **BSL Language Server** (LSP implementation for 1C:Enterprise and OneScript).
 
-> **Внимание:** для автоматического запуска LSP требуется Java (JVM). В будущем расширение сможет само находить Java и скачивать сервер (Фаза 4). Пока — настройка вручную.
+> **Note:** The WASM extension (v0.1.0) can auto-download and launch the LSP. Manual setup below is a fallback.
 
-## 1. Установка BSL Language Server
+## 1. Install BSL Language Server
 
-Скачайте JAR-файл с [GitHub Releases](https://github.com/1c-syntax/bsl-language-server/releases):
+Download the JAR from [GitHub Releases](https://github.com/1c-syntax/bsl-language-server/releases):
 
 ```bash
-# Пример: скачать последнюю версию
-wget https://github.com/1c-syntax/bsl-language-server/releases/download/v0.9.0/bsl-language-server.jar -O ~/bin/bsl-language-server.jar
+wget https://github.com/1c-syntax/bsl-language-server/releases/download/v0.9.0/bsl-language-server.jar \
+  -O ~/bin/bsl-language-server.jar
 ```
 
-Или через расширение VS Code — оно автоматически скачивает JAR в кэш.
+**Requirements:** Java 17+ (JRE or JDK).
 
-## 2. Настройка в Zed
+## 2. Zed Configuration (Manual, fallback)
 
-Добавьте в `settings.json` (Zed → Open Settings):
+Add to `settings.json` (Zed → Open Settings):
 
 ```json
 {
@@ -36,7 +36,7 @@ wget https://github.com/1c-syntax/bsl-language-server/releases/download/v0.9.0/b
 }
 ```
 
-**Важно:** укажите **абсолютный путь** к JAR-файлу, если он не в текущей директории:
+Use an **absolute path** to the JAR if not in the working directory:
 
 ```json
 {
@@ -55,11 +55,9 @@ wget https://github.com/1c-syntax/bsl-language-server/releases/download/v0.9.0/b
 }
 ```
 
-Или можно использовать переменную окружения `PATH`, разместив JAR в одной из системных директорий.
+## 3. Project Configuration (Optional)
 
-## 3. Конфигурация проекта (опционально)
-
-Создайте файл `.bsl-language-server.json` в корне вашего проекта:
+Create `.bsl-language-server.json` in the project root:
 
 ```json
 {
@@ -72,36 +70,34 @@ wget https://github.com/1c-syntax/bsl-language-server/releases/download/v0.9.0/b
 }
 ```
 
-Подробнее: https://1c-syntax.github.io/bsl-language-server/configuration
+Details: https://1c-syntax.github.io/bsl-language-server/configuration
 
-## 4. Проверка
+## 4. Verification
 
-1. Откройте любой `.bsl` файл в своём проекте
-2. В строке состояния Zed должен появиться индикатор BSL LSP
-3. Ctrl+Shift+I (или View → LSP Log) — проверьте логи на предмет ошибок
-4. Наведите курсор на имя процедуры — должен появиться hover с информацией
+1. Open any `.bsl` file in your project
+2. The status bar should show a BSL LSP indicator
+3. `Ctrl+Shift+I` (View → LSP Log) — check for errors
+4. Hover over a procedure name — hover info should appear
 
-## 5. Возможности
+## 5. Features
 
-После успешной настройки доступны:
+- ✔ Diagnostics (errors, warnings)
+- ✔ Autocompletion (global context functions, procedures)
+- ✔ Hover information
+- ✔ Go to Definition
+- ✔ Find References
+- ✔ Rename
+- ✔ Code Actions (quick fixes)
+- ✔ Semantic Tokens
+- ✔ Folding
+- ✔ Inlay Hints
 
-- ✔ Диагностика (ошибки, предупреждения)
-- ✔ Автодополнение (встроенные функции глобального контекста, процедуры)
-- ✔ Hover (информация по наведению)
-- ✔ Go to Definition (переход к определению)
-- ✔ Find References (поиск использований)
-- ✔ Rename (переименование символов)
-- ✔ Code Actions (быстрые исправления)
-- ✔ Semantic Tokens (семантическая подсветка)
-- ✔ Folding (сворачивание блоков)
-- ✔ Inlay Hints (подсказки о типах)
+## 6. Troubleshooting
 
-## 6. Устранение проблем
-
-| Проблема | Решение |
-|----------|---------|
-| Не видит Java | Убедитесь, что `java` доступна в PATH: `java -version` |
-| Ошибка памяти | Увеличьте `-Xmx2g` → `-Xmx4g` |
-| Не подключается к LSP | Проверьте логи: Ctrl+Shift+I → LSP Log |
-| Не скачивается JAR | Проверьте URL и доступ к GitHub |
-| BSL LSP не запускается | Попробуйте запустить вручную: `java -jar bsl-language-server.jar --lsp` |
+| Issue | Solution |
+|-------|----------|
+| Java not found | Ensure `java` is in PATH: `java -version` |
+| Out of memory | Increase `-Xmx2g` → `-Xmx4g` |
+| LSP won't connect | Check logs: `Ctrl+Shift+I` → LSP Log |
+| JAR download failed | Check URL and GitHub access |
+| LSP won't start | Run manually: `java -jar bsl-language-server.jar --lsp` |

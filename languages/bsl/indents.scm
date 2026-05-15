@@ -55,11 +55,11 @@
 ; #Область ... #КонецОбласти
 ; #Если ... #КонецЕсли
 ; -----------------------------------------------------------------------------
-(preprocessor
-  (PREPROC_ENDREGION_KEYWORD) @end) @indent
-
-(preprocessor
-  (PREPROC_ENDIF_KEYWORD) @end) @indent
+; Все содержимое preprocessor получает +1 отступ
+(preprocessor) @indent
+; Конец области возвращает отступ на уровень выше
+(PREPROC_ENDREGION_KEYWORD) @end
+(PREPROC_ENDIF_KEYWORD) @end
 
 ; -----------------------------------------------------------------------------
 ; 6. СКОБКИ И МНОГОСТРОЧНЫЕ ВЫРАЖЕНИЯ

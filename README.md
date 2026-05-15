@@ -1,38 +1,53 @@
-# 1C BSL для Zed
+# 1C BSL for Zed
 
-Расширение для IDE Zed с поддержкой подсветки синтаксиса 1C:Enterprise BSL, OneScript и языка запросов 1С SDBL.
+Zed IDE extension with syntax highlighting for 1C:Enterprise BSL, OneScript, and 1C SDBL query language.
 
-Репозиторий проекта: https://github.com/Nesterland/zed-1c-bsl
+Repository: https://github.com/Nesterland/zed-1c-bsl
 
-**Версия:** 0.0.3 | **Статус:** 🚧 В разработке
+**Version:** 0.1.0 | **Status:** 🚧 In development (WASM ready, needs Zed testing)
 
-## Что поддерживается
+## Features
 
-- Файлы BSL: `.bsl`, `.osl`.
-- Файлы запросов 1С: `.sdbl`.
-- Подсветка ключевых слов, процедур, функций, вызовов методов, строк, чисел, дат, комментариев и препроцессора.
-- Подсветка встроенных запросов 1С внутри строк BSL, если строка начинается с `ВЫБРАТЬ`, `SELECT`, `УНИЧТОЖИТЬ` или `DROP`.
-- Скобки и парные символы.
-- Сниппеты для процедур, функций, условий, циклов, попыток и областей (~40 шт).
-- Outline (структура документа), text objects.
-- LSP-диагностика и автодополнение через [BSL Language Server](https://github.com/1c-syntax/bsl-language-server).
-- Авто-отступы (indents) для всех основных конструкций.
+- **BSL files:** `.bsl`, `.osl` — full syntax highlighting
+- **SDBL files:** `.sdbl` — query language highlighting
+- **Embedded queries:** SDBL highlighting inside BSL strings starting with `ВЫБРАТЬ`/`SELECT`/`УНИЧТОЖИТЬ`/`DROP`
+- **Auto-indentation:** procedures, functions, conditions, loops, try/except, preprocessor regions
+- **Snippets:** ~40 snippets (procedures, functions, if/else, loops, try/except, regions)
+- **Outline & text objects:** document structure, block navigation
+- **Bracket matching:** `()`, `[]`, `""`
+- **LSP integration:** diagnostics, autocompletion, hover, go-to-def, find-references, rename via [BSL Language Server](https://github.com/1c-syntax/bsl-language-server)
+- **WASM auto-start (v0.1.0):** automatic Java detection + JAR download + LSP launch — no manual setup
 
-## Структура
+> **Note:** For `#Region ... #EndRegion` folding, ensure the region body is indented. Auto-indent handles this on newline.
+
+## Quick Start
+
+1. Install the extension from the Zed Extensions catalog (or `Install Dev Extension` for local)
+2. Open any `.bsl` or `.osl` file
+3. **v0.1.0:** The WASM extension auto-finds Java, downloads `bsl-language-server.jar`, and launches LSP
+4. Diagnostics, autocompletion, and navigation work out of the box
+
+**Requirements:** Java 17+ (JRE/JDK). Set `JAVA_HOME` or have `java` in PATH.
+
+## Project Structure
 
 ```
 zed-1c-bsl/
-  extension.toml              # Манифест расширения + LSP-декларация
+  extension.toml              # Manifest + LSP + WASM declaration
+  Cargo.toml                  # Rust WASM project
+  src/lib.rs                  # Extension trait implementation
+  1c-bsl.wasm                 # Compiled WASM (~158K)
   LICENSE                     # MIT
   README.md
+  CHANGELOG.md
   languages/
     bsl/
-      config.toml             # Описание языка BSL
-      highlights.scm          # Правила подсветки BSL
-      injections.scm          # Внедрение SDBL в строки BSL
-      brackets.scm            # Парные скобки
-      indents.scm             # Авто-отступы
-      outline.scm             # Структура документа
+      config.toml
+      highlights.scm          # BSL highlighting rules
+      injections.scm          # SDBL injection into BSL strings
+      brackets.scm            # Bracket pairs
+      indents.scm             # Auto-indentation
+      outline.scm             # Document outline
       textobjects.scm         # Text objects
     sdbl/
       config.toml
@@ -41,54 +56,38 @@ zed-1c-bsl/
       config.toml
       highlights.scm
   snippets/
-    bsl.json                  # ~40 сниппетов
+    bsl.json                  # ~40 snippets
   examples/
-    basic.bsl                 # Пример BSL-файла
-    query.sdbl                # Пример файла запроса
+    basic.bsl
+    basic_1.bsl
+    query.sdbl
   docs/
-    LSP_SETUP.md              # Инструкция по настройке LSP
-  .bsl-language-server.json   # Шаблон конфигурации LSP
-  grammars/                   # Tree-sitter грамматики (submodule)
+    LSP_SETUP.md              # LSP setup guide (manual fallback)
+    WASM_BUILD.md             # WASM build instructions
+  .bsl-language-server.json   # LSP configuration template
+  grammars/                   # Tree-sitter grammars (submodule)
 ```
 
-## LSP-диагностика и автодополнение
+## Installation (Development)
 
-Расширение поддерживает интеграцию с **BSL Language Server** (LSP) — диагностика ошибок, автодополнение, навигация, hover, переименование и многое другое.
+1. Install Rust: `rustup update`
+2. Add WASM target: `rustup target add wasm32-wasip1`
+3. Build WASM: `cargo build --target wasm32-wasip1 --release`
+4. Copy artifact: `cp target/wasm32-wasip1/release/zed_1c_bsl.wasm ./1c-bsl.wasm`
+5. Open Zed → Extensions → `Install Dev Extension` → select this folder
+6. Open `examples/basic.bsl` to test
 
-Для настройки потребуется Java и JAR-файл `bsl-language-server.jar`. Подробная инструкция — в [docs/LSP_SETUP.md](docs/LSP_SETUP.md).
+## Grammar
 
-> В будущем (Фаза 4) расширение будет само находить Java и скачивать сервер без ручной настройки.
+Tree-sitter grammar: https://github.com/alkoleft/tree-sitter-bsl (rev pinned in `extension.toml`).
 
-## Как установить локально в Zed
+## Publishing
 
-1. Установи Rust через `rustup`, если он ещё не установлен. Zed использует Rust для сборки Tree-sitter грамматик dev-расширений.
-2. Открой Zed.
-3. Открой Extensions.
-4. Нажми `Install Dev Extension`.
-5. Выбери папку этого проекта: `BSL`.
-6. Открой `examples/basic.bsl` или любой `.bsl` файл.
+1. Push to https://github.com/Nesterland/zed-1c-bsl
+2. Fork https://github.com/zed-industries/extensions
+3. Add submodule + `extensions.toml` entry
+4. Open PR into `zed-industries/extensions`
 
-Если расширение не загрузилось, открой лог Zed через команду `zed: open log` и проверь ошибки сборки grammar.
+## License
 
-## Используемая грамматика
-
-Расширение использует Tree-sitter грамматику:
-
-- `https://github.com/alkoleft/tree-sitter-bsl`
-
-В `extension.toml` зафиксирован конкретный `rev`, чтобы сборка была повторяемой.
-
-## Публикация
-
-План публикации расширения:
-
-1. Создать публичный репозиторий `https://github.com/Nesterland/zed-1c-bsl`.
-2. Загрузить туда содержимое этой папки.
-3. Проверить расширение локально через `Install Dev Extension` в Zed.
-4. Сделать fork репозитория `https://github.com/zed-industries/extensions`.
-5. Добавить расширение в официальный реестр Zed extensions.
-6. Открыть Pull Request в `zed-industries/extensions`.
-
-## Лицензия
-
-MIT. См. файл `LICENSE`.
+MIT. See `LICENSE`.

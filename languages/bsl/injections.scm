@@ -1,7 +1,28 @@
-; Parse static BSL string literals that start with a query-language statement
-; using the standalone SDBL grammar. Keep the BSL string node shape unchanged.
+; =============================================================================
+; 1C BSL — Language injections (SDBL Embedded)
+; Версия: 0.0.3
+; =============================================================================
+;
+; Логика:
+;   BSL-строка, начинающаяся с ключевого слова запроса, передаётся парсеру
+;   SDBL Embedded для подсветки как встроенного запроса.
+;
+;   Разбор regex (см. #match? ниже):
+;     ^\"            — открывающая кавычка BSL-строки
+;     [\s|]*         — whitespace или | (символ конкатенации строк BSL)
+;                      Пример: "|ВЫБРАТЬ ..." — | стоит перед ключевым словом
+;     (?i)           — регистронезависимое сравнение для ключевых слов
+;     (выбрать|select|уничтожить|drop) — ключевые слова начала запроса
+;     (\s|$)         — после ключевого слова обязан быть пробел/перевод строки
+;                      или конец строки (закрывающая кавычка сразу после)
+;
+;   Поддерживаемые типы запросов:
+;     - ВЫБРАТЬ / SELECT  → query_package / query
+;     - УНИЧТОЖИТЬ / DROP → destroy_statement
+;
+; =============================================================================
 
 ((string) @injection.content
-  (#match? @injection.content "^\"[\\s|]*(ВЫБРАТЬ|выбрать|SELECT|select|УНИЧТОЖИТЬ|уничтожить|DROP|drop)(\\s|$)")
+  (#match? @injection.content "^\"[\\s|]*(?i)(выбрать|select|уничтожить|drop)(\\s|$)")
   (#set! injection.language "SDBL Embedded")
   (#set! injection.include-children))

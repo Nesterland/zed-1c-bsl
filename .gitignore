@@ -3,7 +3,7 @@
 node_modules
 *.log
 /target
-Cargo.lock
+# Cargo.lock коммитим для воспроизводимой WASM-сборки
 gh.zip
 gh_setup.msi
 gh_cli/
