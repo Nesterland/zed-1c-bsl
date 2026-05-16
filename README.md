@@ -4,7 +4,7 @@ Zed IDE extension with syntax highlighting for 1C:Enterprise BSL, OneScript, and
 
 Repository: https://github.com/Nesterland/zed-1c-bsl
 
-**Version:** 0.1.0 | **Status:** 🚧 In development (WASM ready, needs Zed testing)
+**Version:** 0.1.2 | **Status:** 🚧 In development (WASM ready, needs Zed testing)
 
 ## Features
 

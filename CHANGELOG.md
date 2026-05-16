@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.2] — Unreleased
+
+### Added
+- `highlights.scm` — type after `Новый` (`@type`), object properties (`@variable.member`), local `Перем` (`var_statement`), +14 categories of built-in functions (~120 identifiers)
+- `highlights.scm` — scope reference table in header
+- `snippets/bsl.json` — full query with result traversal (`запрос`), query with parameter (`запросп`)
+- `snippets/bsl.json` — full Russian word snippets: `процедура`, `функция`, `если`, `для`, `пока`, `попытка`, `область`, `перем`
+- `snippets/bsl.json` — export variants: `процедураэ`, `функцияэ`
+
+### Fixed
+- `highlights.scm` — `Экспорт` and `Знач` now use `@keyword` (guaranteed color in any Zed theme)
+- `highlights.scm` — function/method parameters now use `@type` (distinct color from `@variable`)
+- `highlights.scm` — commented out `new_expression_method` capture (inline `expression` field breaks query compilation)
+
 ## [0.1.0] — Unreleased
 
 ### Added
