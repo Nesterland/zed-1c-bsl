@@ -1,9 +1,37 @@
 ; =============================================================================
 ; 1C BSL — Подсветка синтаксиса для Zed
-; Версия: 0.0.2
+; Версия: 0.1.2
 ; Основано на: tree-sitter-bsl (alkoleft), vsc-language-1c-bsl (1c-syntax)
 ; =============================================================================
 
+; -----------------------------------------------------------------------------
+; Таблица scope'ов Zed:
+;   @constructor        — Новый
+;   @type               — тип после Новый (Новый Структура)
+;   @variable           — переменные по умолчанию
+;   @variable.parameter — параметры процедур/функций
+;   @variable.member    — свойства объекта (Объект.Свойство)
+;   @variable.builtin   — встроенные свойства глобального контекста
+;   @function           — имена процедур/функций, вызовы методов
+;   @function.call      — вызов функции через точку
+;   @function.builtin   — встроенные функции глобального контекста
+;   @keyword            — объявления (Процедура, КонецПроцедуры, Перем)
+;   @keyword.control    — условия, циклы, исключения, переходы
+;   @keyword.operator   — логические операторы (И, ИЛИ, НЕ)
+;   @keyword.directive  — препроцессор (#Если, #Область)
+;   @storage.modifier   — модификаторы (Экспорт, Знач, Асинх)
+;   @namespace          — имя #Области
+;   @attribute          — аннотации и директивы компиляции (&НаКлиенте)
+;   @label              — метки (~метка:)
+;   @constant           — даты и значения по умолчанию параметров
+;   @constant.builtin   — Истина, Ложь, Неопределено, NULL
+;   @number             — числа
+;   @string             — строки
+;   @operator           — операторы (+, -, *, /, =, <>, ...)
+;   @punctuation.bracket — скобки
+;   @punctuation.delimiter — ; , .
+;   @comment            — // комментарии
+;
 ; -----------------------------------------------------------------------------
 ; 1. Комментарии
 ; -----------------------------------------------------------------------------
@@ -74,13 +102,31 @@
 ] @keyword
 
 ; -----------------------------------------------------------------------------
-; 5. Модификаторы (storage.modifier)
+; 5. Модификаторы (keyword — для гарантированного цвета в теме)
 ; -----------------------------------------------------------------------------
+; Экспорт / Val / Асинх
+; Используем @keyword чтобы гарантированно был видимый цвет в любой теме
 [
   (EXPORT_KEYWORD)
   (VAL_KEYWORD)
   (ASYNC_KEYWORD)
-] @storage.modifier
+] @keyword
+
+; Экспорт в объявлении процедуры (поле export)
+(procedure_definition
+  export: (EXPORT_KEYWORD) @keyword)
+
+; Экспорт в объявлении функции (поле export)
+(function_definition
+  export: (EXPORT_KEYWORD) @keyword)
+
+; Экспорт в объявлении Перем (поле export)
+(var_definition
+  export: (EXPORT_KEYWORD) @keyword)
+
+; Экспорт в variable_spec (Перем Имя Экспорт)
+(variable_spec
+  export: (EXPORT_KEYWORD) @keyword)
 
 ; -----------------------------------------------------------------------------
 ; 6. Логические операторы (keyword.operator)
@@ -109,6 +155,15 @@
 ; -----------------------------------------------------------------------------
 (NEW_KEYWORD) @constructor
 
+; Тип после Новый (Новый Структура, Новый Массив)
+(new_expression
+  type: (identifier) @type)
+
+; Тип в Новый(...) (Новый(Тип, Аргументы))
+; Примечание: new_expression_method.type = expression — inline-тип,
+; нельзя захватить как named node. Пропускаем, чтобы не ломать компиляцию.
+; (new_expression_method type: (identifier) @type) ; ← вызывает ошибку компиляции
+
 ; -----------------------------------------------------------------------------
 ; 10. Препроцессор (keyword.directive)
 ; -----------------------------------------------------------------------------
@@ -133,9 +188,9 @@
 (annotation) @attribute
 
 ; -----------------------------------------------------------------------------
-; 12. Идентификаторы по умолчанию — переменные (catch-all, ПЕРВЫМ!)
-;     Более специфичные правила НИЖЕ переопределяют эту подсветку
-;     (в Tree-sitter последнее совпадение побеждает).
+; 12. Идентификаторы по умолчанию — catch-all (ПЕРВЫМ!)
+;     В Zed МЕНЬШИЙ номер pattern = проигрывает. Все специфичные captures
+;     размещены НИЖЕ (секции 13-21) с БОЛЬШИМ номером pattern и побеждают.
 ; -----------------------------------------------------------------------------
 (identifier) @variable
 
@@ -156,6 +211,9 @@
 (call_expression
   (access
     (identifier) @function.call))
+
+; Свойства объектов (Объект.Свойство)
+(property) @variable.member
 
 ; -----------------------------------------------------------------------------
 ; 14. Встроенные функции глобального контекста (ПЕРЕОПРЕДЕЛЯЮТ catch-all)
@@ -209,19 +267,99 @@
 ((identifier) @function.builtin
   (#match? @function.builtin "^(Мин|Min|Макс|Max|Вычислить|Eval|ОписаниеОшибки|ErrorDescription|ИнформацияОбОшибке|ErrorInfo|Base64Значение|Base64Value|Base64Строка|Base64String|ЗаполнитьЗначенияСвойств|FillPropertyValues|ЗначениеЗаполнено|ValueIsFilled|Найти|Find)$"))
 
+; ... Конфигурация (общие макеты, предопределённые значения)
+((identifier) @function.builtin
+  (#match? @function.builtin "^(ПолучитьОбщийМакет|GetCommonTemplate|ПолучитьОбщуюФорму|GetCommonForm|ПредопределенноеЗначение|PredefinedValue|ПолучитьПолноеИмяПредопределенногоЗначения|GetPredefinedValueFullName)$"))
+
+; ... Сеанс работы (заголовки, пользователи, языки)
+((identifier) @function.builtin
+  (#match? @function.builtin "^(ПолучитьЗаголовокСистемы|GetCaption|УстановитьЗаголовокСистемы|SetCaption|ИмяКомпьютера|ComputerName|ИмяПользователя|UserName|ПолноеИмяПользователя|UserFullName|ТекущийЯзык|CurrentLanguage|ТекущийКодЛокализации|CurrentLocaleCode|ЗавершитьРаботуСистемы|Exit|СтрокаСоединенияИнформационнойБазы|InfoBaseConnectionString|ПравоДоступа|AccessRight|РольДоступна|IsInRole|ТекущийЯзыкСистемы|CurrentSystemLanguage|ТекущийРежимЗапуска|CurrentRunMode|ТекущаяДатаСеанса|CurrentSessionDate|ПараметрыДоступа|AccessParameters)$"))
+
+; ... ОС и внешние компоненты
+((identifier) @function.builtin
+  (#match? @function.builtin "^(КомандаСистемы|System|ЗапуститьПриложение|RunApp|ПолучитьCOMОбъект|GetCOMObject|ПодключитьВнешнююКомпоненту|AttachAddIn|УстановитьВнешнююКомпоненту|InstallAddIn)$"))
+
+; ... Временное хранилище
+((identifier) @function.builtin
+  (#match? @function.builtin "^(ПоместитьВоВременноеХранилище|PutToTempStorage|ПолучитьИзВременногоХранилища|GetFromTempStorage|УдалитьИзВременногоХранилища|DeleteFromTempStorage|ЭтоАдресВременногоХранилища|IsTempStorageURL)$"))
+
+; ... Работа с данными ИБ (поиск, удаление объектов)
+((identifier) @function.builtin
+  (#match? @function.builtin "^(НайтиПомеченныеНаУдаление|FindMarkedForDeletion|НайтиПоСсылкам|FindByRef|УдалитьОбъекты|DeleteObjects)$"))
+
+; ... Журнал регистрации
+((identifier) @function.builtin
+  (#match? @function.builtin "^(ЗаписьЖурналаРегистрации|WriteLogEvent|ПолучитьИспользованиеЖурналаРегистрации|GetEventLogUsing|УстановитьИспользованиеЖурналаРегистрации|SetEventLogUsing|ВыгрузитьЖурналРегистрации|UnloadEventLog|ОчиститьЖурналРегистрации|ClearEventLog)$"))
+
+; ... Навигационные ссылки и окна
+((identifier) @function.builtin
+  (#match? @function.builtin "^(ПолучитьНавигационнуюСсылку|GetURL|ПерейтиПоНавигационнойСсылке|GotoURL|ПолучитьОкна|GetWindows|НайтиОкноПоНавигационнойСсылке|FindWindowByURL|ПолучитьНавигационнуюСсылкуИнформационнойБазы|GetInfoBaseURL|ПолучитьПредставленияНавигационныхСсылок|GetURLsPresentations)$"))
+
+; ... События приложения
+((identifier) @function.builtin
+  (#match? @function.builtin "^(ПередНачаломРаботыСистемы|BeforeStart|ПриНачалеРаботыСистемы|OnStart|ПередЗавершениемРаботыСистемы|BeforeExit|ПриЗавершенииРаботыСистемы|OnExit|ОбработкаВнешнегоСобытия|ExternEventProcessing|УстановкаПараметровСеанса|SessionParametersSetting)$"))
+
+; ... Двоичные данные
+((identifier) @function.builtin
+  (#match? @function.builtin "^(СоединитьБуферыДвоичныхДанных|ConcatBinaryDataBuffers)$"))
+
+; ... Время (универсальное / местное)
+((identifier) @function.builtin
+  (#match? @function.builtin "^(ТекущаяУниверсальнаяДата|CurrentUniversalDate|ТекущаяУниверсальнаяДатаВМиллисекундах|CurrentUniversalDateInMilliseconds|МестноеВремя|ToLocalTime|УниверсальноеВремя|ToUniversalTime|ЧасовойПояс|TimeZone)$"))
+
+; ... Функциональные опции
+((identifier) @function.builtin
+  (#match? @function.builtin "^(ПолучитьФункциональнуюОпцию|GetFunctionalOption|ПолучитьФункциональнуюОпциюИнтерфейса|GetInterfaceFunctionalOption|ОбновитьИнтерфейс|RefreshInterface)$"))
+
+; ... Сериализация значений
+((identifier) @function.builtin
+  (#match? @function.builtin "^(ЗначениеВСтрокуВнутр|ValueToStringInternal|ЗначениеИзСтрокиВнутр|ValueFromStringInternal|ЗначениеВФайл|ValueToFile|ЗначениеИзФайла|ValueFromFile|ЗначениеВДанныеФормы|ValueToFormData|ДанныеФормыВЗначение|FormDataToValue|КопироватьДанныеФормы|CopyFormData)$"))
+
+; ... Глобальный контекст — расширенные переменные
+((identifier) @variable.builtin
+  (#match? @variable.builtin "^(ХранилищеВариантовОтчетов|ReportsVariantsStorage|ХранилищеНастроекДанныхФорм|FormDataSettingsStorage|ХранилищеОбщихНастроек|CommonSettingsStorage|ХранилищеПользовательскихНастроекДинамическихСписков|DynamicListsUserSettingsStorage|ХранилищеПользовательскихНастроекОтчетов|ReportsUserSettingsStorage|ХранилищеСистемныхНастроек|SystemSettingsStorage|БиблиотекаМакетовОформленияКомпоновкиДанных|DataCompositionAppearanceTemplateLib|БиблиотекаСтилей|StyleLib|ВнешниеОбработки|ExternalDataProcessors|ВнешниеОтчеты|ExternalReports|ДоставляемыеУведомления|DeliverableNotifications|ПолнотекстовыйПоиск|FullTextSearch|СредстваГеопозиционирования|LocationTools|СредстваОтображенияРекламы|AdvertisingPresentationTools)$"))
+
 ; -----------------------------------------------------------------------------
 ; 15. Объявления Перем и параметры (ПЕРЕОПРЕДЕЛЯЮТ catch-all)
 ; -----------------------------------------------------------------------------
-; Объявления Перем
+; Объявления Перем (на уровне модуля, с возможным Экспорт)
 ; Примечание: _var_definition_variables — скрытый узел, его нельзя указывать в запросе.
 ; Переменные (variable_spec) напрямую всплывают в var_definition.
 (var_definition
   (variable_spec
     name: (identifier) @variable))
 
-; Параметры процедур и функций (подсвечиваются как параметры, не как обычные переменные)
+; Локальный Перем (внутри процедур/функций, без Экспорт)
+; var_statement — это Перем внутри тела метода, var_definition — на уровне модуля
+(var_statement
+  var_name: (identifier) @variable)
+
+; Имена параметров процедур и функций
+; Используем @type — в Zed variable.parameter = variable (один цвет),
+; а type имеет отдельный цвет. Также @type визуально выделяет параметры.
+; Примечание: parameter — именованный узел внутри parameters
 (parameter
-  name: (identifier) @variable.parameter)
+  name: (identifier) @type)
+
+; Ключевое слово Знач (val) в параметрах
+(parameter
+  val: (VAL_KEYWORD) @keyword)
+
+; Значения по умолчанию параметров (подсвечиваются как константы)
+(parameter
+  def: (_) @constant)
+
+; Явный захват параметров внутри объявлений процедур (двойной захват для надёжности)
+(procedure_definition
+  parameters: (parameters
+    (parameter
+      name: (identifier) @type)))
+
+; Явный захват параметров внутри объявлений функций
+(function_definition
+  parameters: (parameters
+    (parameter
+      name: (identifier) @type)))
 
 ; -----------------------------------------------------------------------------
 ; 16. Метки (~метка:) (ПЕРЕОПРЕДЕЛЯЕТ catch-all)
