@@ -2,6 +2,35 @@
 
 ## Версия: 0.1.2 (текущая)
 
+### v0.1.2: Третий ребаз PR #6082 (2026-09-21)
+
+**Проблема:** После ребаза 2026-08-17 main снова ушёл вперёд (223 коммита). В GitHub UI ветки PR появился merge-коммит «Update branch» (`373e8798`, base + merge branch 'main' 2026-08-22) — локально его не было, удалённая ветка разошлась с локальной.
+
+**Исправления:**
+1. `git fetch upstream && git fetch origin` — синхронизация; обнаружен merge-коммит `373e8798`
+2. `git rebase upstream/main` — merge-коммит отброшен (в нём нет наших изменений), 8 PR-коммитов наложены поверх `0aed78f2` чисто, конфликтов нет
+3. `node src/sort-extensions.js` — сортировка подтверждена (изменений по содержимому нет, только LF/CRLF)
+4. Force-push с `--force-with-lease` → ветка `bd82e953` (0 впереди upstream, 8 позади)
+
+**Результат:** ✅ `mergeable_state: clean`, все checks ✅ (danger, package). Diff PR минимален: +4 `.gitmodules`, +4 `extensions.toml`, +1 submodule. Подготовлен текст комментария мейнтейнерам (gh не установлен — отправка вручную).
+
+---
+
+### v0.1.2: Повторное обновление PR #6082 — rebase на актуальный main (2026-08-17)
+
+**Проблема:** За 3 месяца ожидания ревью ветка `main` в `zed-industries/extensions` ушла вперёд на ~600 коммитов. PR #6082 стал `mergeable_state: dirty` — конфликты в `.gitmodules` и `extensions.toml` (upstream добавил `8008-theme` на алфавитную позицию рядом с `1c-bsl`).
+
+**Исправления:**
+1. `git fetch upstream && git merge upstream/main` → конфликты в `.gitmodules` и `extensions.toml`
+2. Решено сохранить обе записи в алфавитном порядке (`1c-bsl` перед `8008-theme`, т.к. `'1' < '8'`)
+3. Вместо merge-коммита выполнен `git rebase upstream/main` для чистой истории: PR-коммиты (7 шт) поверх актуального main; git сам отбросил устаревший коммит "Remove conflict markers" (патч уже в upstream)
+4. `node src/sort-extensions.js` — подтвердил корректную сортировку (убран лишний пустой строк в .gitmodules)
+5. Force-push с `--force-with-lease` (единственный автор PR)
+
+**Результат:** ✅ `mergeable_state: clean`, все checks пройдены (danger, package, cla-signed). Diff PR минимален: +1 запись `[1c-bsl]` v0.1.2 в обоих файлах. 8 коммитов в PR.
+
+---
+
 ### v0.1.2: Фикс CI в PR #6082 — версия и сортировка (2025-01-20)
 
 **Проблема:** CI в PR #6082 (zed-industries/extensions) падал с двумя ошибками:
